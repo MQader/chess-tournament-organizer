@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chess Tournament Organizer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #6c757d;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            background: white;
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+        }
+
+        .tab:hover {
+            background: #e9ecef;
+            color: #2c3e50;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: transform 0.2s ease;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+
+        .btn-danger:hover {
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+        }
+
+        .player-list {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .player-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid #3498db;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.2s ease;
+        }
+
+        .player-card:hover {
+            transform: translateX(5px);
+        }
+
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .player-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .age-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .youth {
+            background: #e8f5e8;
+            color: #2d5a2d;
+        }
+
+        .adult {
+            background: #e8f2ff;
+            color: #1a365d;
+        }
+
+        .tournament-bracket {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            min-height: 300px;
+        }
+
+        .round {
+            margin-bottom: 30px;
+        }
+
+        .round-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .matches {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .match {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .match:hover {
+            border-color: #3498db;
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.1);
+        }
+
+        .match-players {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .match-result {
+            text-align: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            border: 2px solid #e9ecef;
+            transition: transform 0.2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-weight: 600;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 2px solid #e9ecef;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .export-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .export-section h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .tab {
+                text-align: center;
+            }
+            
+            .match-players {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>♔ Chess Tournament Organizer ♛</h1>
+            <p>Organize youth and adult chess tournaments with ease</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('setup')">Tournament Setup</button>
+            <button class="tab" onclick="showTab('players')">Players</button>
+            <button class="tab" onclick="showTab('brackets')">Brackets</button>
+            <button class="tab" onclick="showTab('results')">Results</button>
+            <button class="tab" onclick="showTab('export')">Export</button>
+        </div>
+
+        <div id="setup" class="tab-content active">
+            <h2>Tournament Setup</h2>
+            <div class="form-group">
+                <label for="tournamentName">Tournament Name</label>
+                <input type="text" id="tournamentName" placeholder="e.g., Spring Chess Championship 2025">
+            </div>
+            <div class="form-group">
+                <label for="tournamentDate">Date</label>
+                <input type="date" id="tournamentDate">
+            </div>
+            <div class="form-group">
+                <label for="tournamentVenue">Venue</label>
+                <input type="text" id="tournamentVenue" placeholder="e.g., Community Center Main Hall">
+            </div>
+            <div class="form-group">
+                <label for="tournamentType">Tournament Type</label>
+                <select id="tournamentType">
+                    <option value="swiss">Swiss System</option>
+                    <option value="roundrobin">Round Robin</option>
+                    <option value="elimination">Single Elimination</option>
+                    <option value="doubleelim">Double Elimination</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="rounds">Number of Rounds</label>
+                <input type="number" id="rounds" min="1" max="12" value="5">
+            </div>
+            <div class="form-group">
+                <label for="timeControl">Time Control</label>
+                <select id="timeControl">
+                    <option value="90+30">90 minutes + 30 seconds increment</option>
+                    <option value="60+30">60 minutes + 30 seconds increment</option>
+                    <option value="30+30">30 minutes + 30 seconds increment</option>
+                    <option value="15+10">15 minutes + 10 seconds increment</option>
+                    <option value="5+3">5 minutes + 3 seconds increment (Blitz)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="entryFee">Entry Fee</label>
+                <input type="number" id="entryFee" step="0.01" placeholder="0.00">
+            </div>
+            <button class="btn" onclick="saveTournamentSettings()">Save Tournament Settings</button>
+        </div>
+
+        <div id="players" class="tab-content">
+            <h2>Player Registration</h2>
+            <div class="form-group">
+                <label for="playerName">Player Name</label>
+                <input type="text" id="playerName" placeholder="Enter player name">
+            </div>
+            <div class="form-group">
+                <label for="playerAge">Age</label>
+                <input type="number" id="playerAge" min="5" max="100" placeholder="Enter age">
+            </div>
+            <div class="form-group">
+                <label for="playerRating">Rating (optional)</label>
+                <input type="number" id="playerRating" min="100" max="3000" placeholder="Enter chess rating">
+            </div>
+            <div class="form-group">
+                <label for="playerEmail">Email</label>
+                <input type="email" id="playerEmail" placeholder="Enter email address">
+            </div>
+            <div class="form-group">
+                <label for="playerPhone">Phone</label>
+                <input type="tel" id="playerPhone" placeholder="Enter phone number">
+            </div>
+            <button class="btn" onclick="addPlayer()">Add Player</button>
+            <button class="btn" onclick="clearPlayerForm()">Clear Form</button>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalPlayers">0</div>
+                    <div class="stat-label">Total Players</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="youthCount">0</div>
+                    <div class="stat-label">Youth (Under 18)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="adultCount">0</div>
+                    <div class="stat-label">Adults (18+)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="avgRating">0</div>
+                    <div class="stat-label">Average Rating</div>
+                </div>
+            </div>
+
+            <div class="player-list" id="playerList">
+                <div class="empty-state">
+                    <h3>No players registered yet</h3>
+                    <p>Add players using the form above to get started</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="brackets" class="tab-content">
+            <h2>Tournament Brackets</h2>
+            <button class="btn" onclick="generateBrackets()">Generate Brackets</button>
+            <button class="btn" onclick="randomizePairings()">Randomize Pairings</button>
+            
+            <div class="tournament-bracket" id="bracketContainer">
+                <div class="empty-state">
+                    <h3>No brackets generated yet</h3>
+                    <p>Add players first, then click "Generate Brackets" to create tournament pairings</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="results" class="tab-content">
+            <h2>Tournament Results</h2>
+            <div class="form-group">
+                <label for="resultRound">Round</label>
+                <select id="resultRound">
+                    <option value="1">Round 1</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="resultMatch">Match</label>
+                <select id="resultMatch">
+                    <option value="">Select a match</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="matchResult">Result</label>
+                <select id="matchResult">
+                    <option value="">Select result</option>
+                    <option value="1-0">White wins</option>
+                    <option value="0-1">Black wins</option>
+                    <option value="0.5-0.5">Draw</option>
+                </select>
+            </div>
+            <button class="btn" onclick="recordResult()">Record Result</button>
+
+            <div class="chart-container">
+                <h3>Leaderboard</h3>
+                <div id="leaderboard">
+                    <div class="empty-state">
+                        <h3>No results yet</h3>
+                        <p>Record match results to see the leaderboard</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="export" class="tab-content">
+            <h2>Export & Import Tournament Data</h2>
+            
+            <div class="export-section">
+                <h3>💾 Save & Load Tournament</h3>
+                <button class="btn" onclick="exportTournamentData()">📥 Export Tournament Data (JSON)</button>
+                <button class="btn" onclick="document.getElementById('importFile').click()">📤 Import Tournament Data</button>
+                <button class="btn btn-danger" onclick="clearAllData()">🗑️ Clear All Data</button>
+                <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importTournamentData(event)">
+                <p style="margin-top: 10px; color: #6c757d; font-size: 0.9em;">
+                    💡 Your tournament data is automatically saved to your browser. Export to JSON for backup or sharing.
+                </p>
+            </div>
+            
+            <div class="export-section">
+                <h3>📊 Export Tournament Reports</h3>
+                <button class="btn" onclick="exportPlayerList()">Export Player List (CSV)</button>
+                <button class="btn" onclick="exportBrackets()">Export Brackets (PDF-ready)</button>
+                <button class="btn" onclick="exportResults()">Export Results (CSV)</button>
+                <button class="btn" onclick="exportTournamentReport()">Export Full Report</button>
+            </div>
+            
+            <div class="export-section">
+                <h3>🖨️ Print-Ready Materials</h3>
+                <button class="btn" onclick="generatePairingSheets()">Generate Pairing Sheets</button>
+                <button class="btn" onclick="generateResultSheets()">Generate Result Sheets</button>
+                <button class="btn" onclick="generateCertificates()">Generate Certificates</button>
+            </div>
+            
+            <div class="export-section">
+                <h3>🔗 Share Tournament</h3>
+                <button class="btn" onclick="generateShareableLink()">Generate Shareable Link</button>
+                <div id="shareLink" style="margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 5px; display: none;">
+                    <p><strong>Shareable Link:</strong></p>
+                    <input type="text" id="shareLinkInput" readonly style="width: 100%; margin-bottom: 10px;">
+                    <button class="btn" onclick="copyShareLink()">📋 Copy Link</button>
+                    <p style="color: #6c757d; font-size: 0.9em; margin-top: 5px;">
+                        Share this link to let others view your tournament (read-only)
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let tournamentData = {
+            name: '',
+            date: '',
+            venue: '',
+            type: 'swiss',
+            rounds: 5,
+            timeControl: '90+30',
+            entryFee: 0,
+            players: [],
+            brackets: [],
+            results: {}
+        };
+
+        // Data persistence functions
+        function saveTournamentData() {
+            try {
+                localStorage.setItem('chessTournament', JSON.stringify(tournamentData));
+                console.log('Tournament data saved to localStorage');
+            } catch (error) {
+                console.error('Error saving tournament data:', error);
+            }
+        }
+
+        function loadTournamentData() {
+            try {
+                const saved = localStorage.getItem('chessTimeout');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    tournamentData = { ...tournamentData, ...parsed };
+                    
+                    // Restore form values
+                    restoreFormValues();
+                    updatePlayerList();
+                    updatePlayerStats();
+                    updateBracketDisplay();
+                    updateLeaderboard();
+                    updateRoundOptions();
+                    updateMatchOptions();
+                    
+                    console.log('Tournament data loaded from localStorage');
+                    return true;
+                }
+            } catch (error) {
+                console.error('Error loading tournament data:', error);
+            }
+            return false;
+        }
+
+        function restoreFormValues() {
+            if (tournamentData.name) document.getElementById('tournamentName').value = tournamentData.name;
+            if (tournamentData.date) document.getElementById('tournamentDate').value = tournamentData.date;
+            if (tournamentData.venue) document.getElementById('tournamentVenue').value = tournamentData.venue;
+            if (tournamentData.type) document.getElementById('tournamentType').value = tournamentData.type;
+            if (tournamentData.rounds) document.getElementById('rounds').value = tournamentData.rounds;
+            if (tournamentData.timeControl) document.getElementById('timeControl').value = tournamentData.timeControl;
+            if (tournamentData.entryFee) document.getElementById('entryFee').value = tournamentData.entryFee;
+        }
+
+        function exportTournamentData() {
+            const dataStr = JSON.stringify(tournamentData, null, 2);
+            const timestamp = new Date().toISOString().slice(0, 19).replace(/[:-]/g, '');
+            const filename = `tournament_${tournamentData.name ? tournamentData.name.replace(/[^a-zA-Z0-9]/g, '_') : 'data'}_${timestamp}.json`;
+            downloadFile(dataStr, filename, 'application/json');
+        }
+
+        function importTournamentData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    
+                    // Validate imported data structure
+                    if (imported && typeof imported === 'object') {
+                        tournamentData = { ...tournamentData, ...imported };
+                        saveTournamentData();
+                        
+                        // Refresh all displays
+                        restoreFormValues();
+                        updatePlayerList();
+                        updatePlayerStats();
+                        updateBracketDisplay();
+                        updateLeaderboard();
+                        updateRoundOptions();
+                        updateMatchOptions();
+                        
+                        alert('Tournament data imported successfully!');
+                    } else {
+                        alert('Invalid file format. Please select a valid tournament JSON file.');
+                    }
+                } catch (error) {
+                    alert('Error reading file. Please check the file format.');
+                    console.error('Import error:', error);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear all tournament data? This cannot be undone.')) {
+                localStorage.removeItem('chessTimeout');
+                location.reload();
+            }
+        }
+
+        function autoSave() {
+            saveTournamentData();
+        }
+
+        function showTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+
+        function saveTournamentSettings() {
+            tournamentData.name = document.getElementById('tournamentName').value;
+            tournamentData.date = document.getElementById('tournamentDate').value;
+            tournamentData.venue = document.getElementById('tournamentVenue').value;
+            tournamentData.type = document.getElementById('tournamentType').value;
+            tournamentData.rounds = parseInt(document.getElementById('rounds').value);
+            tournamentData.timeControl = document.getElementById('timeControl').value;
+            tournamentData.entryFee = parseFloat(document.getElementById('entryFee').value) || 0;
+            
+            autoSave();
+            alert('Tournament settings saved successfully!');
+            updateRoundOptions();
+        }
+
+        function addPlayer() {
+            const name = document.getElementById('playerName').value;
+            const age = parseInt(document.getElementById('playerAge').value);
+            const rating = parseInt(document.getElementById('playerRating').value) || 0;
+            const email = document.getElementById('playerEmail').value;
+            const phone = document.getElementById('playerPhone').value;
+            
+            if (!name || !age) {
+                alert('Please enter player name and age');
+                return;
+            }
+            
+            const player = {
+                id: Date.now(),
+                name: name,
+                age: age,
+                rating: rating,
+                email: email,
+                phone: phone,
+                category: age < 18 ? 'youth' : 'adult',
+                score: 0,
+                matches: []
+            };
+            
+            tournamentData.players.push(player);
+            clearPlayerForm();
+            updatePlayerList();
+            updatePlayerStats();
+            autoSave();
+        }
+
+        function clearPlayerForm() {
+            document.getElementById('playerName').value = '';
+            document.getElementById('playerAge').value = '';
+            document.getElementById('playerRating').value = '';
+            document.getElementById('playerEmail').value = '';
+            document.getElementById('playerPhone').value = '';
+        }
+
+        function updatePlayerList() {
+            const playerList = document.getElementById('playerList');
+            
+            if (tournamentData.players.length === 0) {
+                playerList.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No players registered yet</h3>
+                        <p>Add players using the form above to get started</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            playerList.innerHTML = tournamentData.players.map(player => `
+                <div class="player-card">
+                    <div class="player-info">
+                        <div class="player-avatar">${player.name.charAt(0).toUpperCase()}</div>
+                        <div>
+                            <strong>${player.name}</strong><br>
+                            Age: ${player.age} | Rating: ${player.rating || 'Unrated'}
+                        </div>
+                        <div class="age-badge ${player.category}">${player.category}</div>
+                    </div>
+                    <button class="btn btn-danger" onclick="removePlayer(${player.id})">Remove</button>
+                </div>
+            `).join('');
+        }
+
+        function removePlayer(playerId) {
+            tournamentData.players = tournamentData.players.filter(p => p.id !== playerId);
+            updatePlayerList();
+            updatePlayerStats();
+            autoSave();
+        }
+
+        function updatePlayerStats() {
+            const total = tournamentData.players.length;
+            const youth = tournamentData.players.filter(p => p.category === 'youth').length;
+            const adult = tournamentData.players.filter(p => p.category === 'adult').length;
+            const avgRating = total > 0 ? 
+                Math.round(tournamentData.players.reduce((sum, p) => sum + (p.rating || 0), 0) / total) : 0;
+            
+            document.getElementById('totalPlayers').textContent = total;
+            document.getElementById('youthCount').textContent = youth;
+            document.getElementById('adultCount').textContent = adult;
+            document.getElementById('avgRating').textContent = avgRating;
+        }
+
+        function generateBrackets() {
+            if (tournamentData.players.length < 2) {
+                alert('Need at least 2 players to generate brackets');
+                return;
+            }
+            
+            const players = [...tournamentData.players].sort((a, b) => (b.rating || 0) - (a.rating || 0));
+            tournamentData.brackets = [];
+            
+            // Generate first round pairings
+            const matches = [];
+            for (let i = 0; i < players.length; i += 2) {
+                if (i + 1 < players.length) {
+                    matches.push({
+                        id: `r1m${i/2 + 1}`,
+                        round: 1,
+                        white: players[i],
+                        black: players[i + 1],
+                        result: null
+                    });
+                }
+            }
+            
+            tournamentData.brackets.push({
+                round: 1,
+                matches: matches
+            });
+            
+            updateBracketDisplay();
+            updateMatchOptions();
+            autoSave();
+        }
+
+        function randomizePairings() {
+            if (tournamentData.players.length < 2) {
+                alert('Need at least 2 players to generate pairings');
+                return;
+            }
+            
+            const players = [...tournamentData.players];
+            // Shuffle array
+            for (let i = players.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [players[i], players[j]] = [players[j], players[i]];
+            }
+            
+            tournamentData.brackets = [];
+            const matches = [];
+            
+            for (let i = 0; i < players.length; i += 2) {
+                if (i + 1 < players.length) {
+                    matches.push({
+                        id: `r1m${i/2 + 1}`,
+                        round: 1,
+                        white: players[i],
+                        black: players[i + 1],
+                        result: null
+                    });
+                }
+            }
+            
+            tournamentData.brackets.push({
+                round: 1,
+                matches: matches
+            });
+            
+            updateBracketDisplay();
+            updateMatchOptions();
+            autoSave();
+        }
+
+        function updateBracketDisplay() {
+            const bracketContainer = document.getElementById('bracketContainer');
+            
+            if (tournamentData.brackets.length === 0) {
+                bracketContainer.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No brackets generated yet</h3>
+                        <p>Add players first, then click "Generate Brackets" to create tournament pairings</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            bracketContainer.innerHTML = tournamentData.brackets.map(round => `
+                <div class="round">
+                    <div class="round-title">Round ${round.round}</div>
+                    <div class="matches">
+                        ${round.matches.map(match => `
+                            <div class="match">
+                                <div class="match-players">
+                                    <div>
+                                        <strong>${match.white.name}</strong> (${match.white.rating || 'UR'})<br>
+                                        <small>${match.white.category}</small>
+                                    </div>
+                                    <div style="font-size: 1.5em; color: #6c757d;">VS</div>
+                                    <div>
+                                        <strong>${match.black.name}</strong> (${match.black.rating || 'UR'})<br>
+                                        <small>${match.black.category}</small>
+                                    </div>
+                                </div>
+                                <div class="match-result">
+                                    ${match.result ? `Result: ${match.result}` : 'No result yet'}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateRoundOptions() {
+            const roundSelect = document.getElementById('resultRound');
+            roundSelect.innerHTML = '';
+            
+            for (let i = 1; i <= tournamentData.rounds; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = `Round ${i}`;
+                roundSelect.appendChild(option);
+            }
+        }
+
+        function updateMatchOptions() {
+            const matchSelect = document.getElementById('resultMatch');
+            const selectedRound = parseInt(document.getElementById('resultRound').value);
+            
+            matchSelect.innerHTML = '<option value="">Select a match</option>';
+            
+            const roundData = tournamentData.brackets.find(r => r.round === selectedRound);
+            if (roundData) {
+                roundData.matches.forEach(match => {
+                    const option = document.createElement('option');
+                    option.value = match.id;
+                    option.textContent = `${match.white.name} vs ${match.black.name}`;
+                    matchSelect.appendChild(option);
+                });
+            }
+        }
+
+        function recordResult() {
+            const roundNum = parseInt(document.getElementById('resultRound').value);
+            const matchId = document.getElementById('resultMatch').value;
+            const result = document.getElementById('matchResult').value;
+            
+            if (!matchId || !result) {
+                alert('Please select a match and result');
+                return;
+            }
+            
+            const roundData = tournamentData.brackets.find(r => r.round === roundNum);
+            if (roundData) {
+                const match = roundData.matches.find(m => m.id === matchId);
+                if (match) {
+                    match.result = result;
+                    
+                    // Update player scores
+                    if (result === '1-0') {
+                        match.white.score += 1;
+                    } else if (result === '0-1') {
+                        match.black.score += 1;
+                    } else if (result === '0.5-0.5') {
+                        match.white.score += 0.5;
+                        match.black.score += 0.5;
+                    }
+                    
+                    updateBracketDisplay();
+                    updateLeaderboard();
+                    autoSave();
+                    
+                    // Clear form
+                    document.getElementById('resultMatch').value = '';
+                    document.getElementById('matchResult').value = '';
+                    
+                    alert('Result recorded successfully!');
+                }
+            }
+        }
+
+        function updateLeaderboard() {
+            const leaderboard = document.getElementById('leaderboard');
+            const sortedPlayers = [...tournamentData.players].sort((a, b) => b.score - a.score);
+            
+            if (sortedPlayers.every(p => p.score === 0)) {
+                leaderboard.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No results yet</h3>
+                        <p>Record match results to see the leaderboard</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            leaderboard.innerHTML = `
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #f8f9fa; border-bottom: 2px solid #dee2e6;">
+                            <th style="padding: 12px; text-align: left;">Rank</th>
+                            <th style="padding: 12px; text-align: left;">Player</th>
+                            <th style="padding: 12px; text-align: center;">Score</th>
+                            <th style="padding: 12px; text-align: center;">Category</th>
+                            <th style="padding: 12px; text-align: center;">Rating</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${sortedPlayers.map((player, index) => `
+                            <tr style="border-bottom: 1px solid #dee2e6;">
+                                <td style="padding: 12px; font-weight: bold;">${index + 1}</td>
+                                <td style="padding: 12px;">${player.name}</td>
+                                <td style="padding: 12px; text-align: center; font-weight: bold;">${player.score}</td>
+                                <td style="padding: 12px; text-align: center;">
+                                    <span class="age-badge ${player.category}">${player.category}</span>
+                                </td>
+                                <td style="padding: 12px; text-align: center;">${player.rating || 'UR'}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        function exportPlayerList() {
+            const csv = [
+                ['Name', 'Age', 'Category', 'Rating', 'Email', 'Phone'],
+                ...tournamentData.players.map(p => [
+                    p.name,
+                    p.age,
+                    p.category,
+                    p.rating || 'Unrated',
+                    p.email || '',
+                    p.phone || ''
+                ])
+            ];
+            
+            const csvContent = csv.map(row => row.join(',')).join('\n');
+            downloadFile(csvContent, 'player_list.csv', 'text/csv');
+        }
+
+        function exportBrackets() {
+            let content = `${tournamentData.name || 'Chess Tournament'} - Brackets\n`;
+            content += `Date: ${tournamentData.date}\n`;
+            content += `Venue: ${tournamentData.venue}\n`;
+            content += `Type: ${tournamentData.type}\n\n`;
+            
+            tournamentData.brackets.forEach(round => {
+                content += `ROUND ${round.round}\n`;
+                content += '='.repeat(50) + '\n';
+                
+                round.matches.forEach((match, index) => {
+                    content += `Match ${index + 1}:\n`;
+                    content += `  White: ${match.white.name} (${match.white.rating || 'UR'})\n`;
+                    content += `  Black: ${match.black.name} (${match.black.rating || 'UR'})\n`;
+                    content += `  Result: ${match.result || 'Pending'}\n\n`;
+                });
+                
+                content += '\n';
+            });
+            
+            downloadFile(content, 'tournament_brackets.txt', 'text/plain');
+        }
+
+        function exportResults() {
+            const csv = [
+                ['Round', 'Match', 'White Player', 'Black Player', 'Result', 'Date'],
+                ...tournamentData.brackets.flatMap(round => 
+                    round.matches.map(match => [
+                        round.round,
+                        match.id,
+                        match.white.name,
+                        match.black.name,
+                        match.result || 'Pending',
+                        tournamentData.date || ''
+                    ])
+                )
+            ];
+            
+            const csvContent = csv.map(row => row.join(',')).join('\n');
+            downloadFile(csvContent, 'tournament_results.csv', 'text/csv');
+        }
+
+        function exportTournamentReport() {
+            const sortedPlayers = [...tournamentData.players].sort((a, b) => b.score - a.score);
+            
+            let report = `TOURNAMENT REPORT\n`;
+            report += '='.repeat(50) + '\n\n';
+            
+            report += `Tournament: ${tournamentData.name || 'Unnamed Tournament'}\n`;
+            report += `Date: ${tournamentData.date || 'Not set'}\n`;
+            report += `Venue: ${tournamentData.venue || 'Not set'}\n`;
+            report += `Type: ${tournamentData.type}\n`;
+            report += `Time Control: ${tournamentData.timeControl}\n`;
+            report += `Entry Fee: ${tournamentData.entryFee}\n\n`;
+            
+            report += `STATISTICS\n`;
+            report += '-'.repeat(30) + '\n';
+            report += `Total Players: ${tournamentData.players.length}\n`;
+            report += `Youth Players: ${tournamentData.players.filter(p => p.category === 'youth').length}\n`;
+            report += `Adult Players: ${tournamentData.players.filter(p => p.category === 'adult').length}\n`;
+            
+            const avgRating = tournamentData.players.length > 0 ? 
+                Math.round(tournamentData.players.reduce((sum, p) => sum + (p.rating || 0), 0) / tournamentData.players.length) : 0;
+            report += `Average Rating: ${avgRating}\n\n`;
+            
+            report += `FINAL STANDINGS\n`;
+            report += '-'.repeat(30) + '\n';
+            sortedPlayers.forEach((player, index) => {
+                report += `${index + 1}. ${player.name} - ${player.score} points (${player.category}, ${player.rating || 'UR'})\n`;
+            });
+            
+            report += '\n' + '='.repeat(50) + '\n';
+            report += `Report generated on: ${new Date().toLocaleString()}\n`;
+            
+            downloadFile(report, 'tournament_report.txt', 'text/plain');
+        }
+
+        function generatePairingSheets() {
+            let content = `${tournamentData.name || 'Chess Tournament'} - Pairing Sheets\n`;
+            content += `Date: ${tournamentData.date}\n`;
+            content += `Time Control: ${tournamentData.timeControl}\n\n`;
+            
+            tournamentData.brackets.forEach(round => {
+                content += `ROUND ${round.round} PAIRINGS\n`;
+                content += '='.repeat(60) + '\n\n';
+                
+                round.matches.forEach((match, index) => {
+                    content += `Board ${index + 1}:\n`;
+                    content += `White: ${match.white.name.padEnd(25)} Rating: ${(match.white.rating || 'UR').toString().padStart(4)}\n`;
+                    content += `Black: ${match.black.name.padEnd(25)} Rating: ${(match.black.rating || 'UR').toString().padStart(4)}\n`;
+                    content += `Result: ___________________\n\n`;
+                });
+                
+                content += '\n' + '='.repeat(60) + '\n\n';
+            });
+            
+            downloadFile(content, 'pairing_sheets.txt', 'text/plain');
+        }
+
+        function generateResultSheets() {
+            let content = `${tournamentData.name || 'Chess Tournament'} - Result Sheets\n`;
+            content += `Date: ${tournamentData.date}\n\n`;
+            
+            tournamentData.brackets.forEach(round => {
+                content += `ROUND ${round.round} RESULTS\n`;
+                content += '='.repeat(60) + '\n\n';
+                
+                round.matches.forEach((match, index) => {
+                    content += `Match ${index + 1}:\n`;
+                    content += `White: ${match.white.name}\n`;
+                    content += `Black: ${match.black.name}\n`;
+                    content += `Result: ${match.result || 'Pending'}\n`;
+                    content += `Arbiter Signature: _________________\n\n`;
+                });
+                
+                content += '\n';
+            });
+            
+            downloadFile(content, 'result_sheets.txt', 'text/plain');
+        }
+
+        function generateCertificates() {
+            const sortedPlayers = [...tournamentData.players].sort((a, b) => b.score - a.score);
+            let content = `CERTIFICATES\n`;
+            content += '='.repeat(60) + '\n\n';
+            
+            // Winner certificates
+            if (sortedPlayers.length > 0) {
+                content += `OVERALL WINNER\n`;
+                content += '-'.repeat(30) + '\n`;
+                content += `This certifies that ${sortedPlayers[0].name} has won\n`;
+                content += `${tournamentData.name || 'Chess Tournament'}\n`;
+                content += `with a score of ${sortedPlayers[0].score} points\n`;
+                content += `on ${tournamentData.date || 'Date'}\n\n`;
+                
+                // Category winners
+                const youthWinner = sortedPlayers.find(p => p.category === 'youth');
+                const adultWinner = sortedPlayers.find(p => p.category === 'adult');
+                
+                if (youthWinner && youthWinner !== sortedPlayers[0]) {
+                    content += `YOUTH CATEGORY WINNER\n`;
+                    content += '-'.repeat(30) + '\n';
+                    content += `This certifies that ${youthWinner.name} has won\n`;
+                    content += `the Youth Category of ${tournamentData.name || 'Chess Tournament'}\n`;
+                    content += `with a score of ${youthWinner.score} points\n`;
+                    content += `on ${tournamentData.date || 'Date'}\n\n`;
+                }
+                
+                if (adultWinner && adultWinner !== sortedPlayers[0]) {
+                    content += `ADULT CATEGORY WINNER\n`;
+                    content += '-'.repeat(30) + '\n';
+                    content += `This certifies that ${adultWinner.name} has won\n`;
+                    content += `the Adult Category of ${tournamentData.name || 'Chess Tournament'}\n`;
+                    content += `with a score of ${adultWinner.score} points\n`;
+                    content += `on ${tournamentData.date || 'Date'}\n\n`;
+                }
+            }
+            
+            // Participation certificates
+            content += `PARTICIPATION CERTIFICATES\n`;
+            content += '-'.repeat(30) + '\n';
+            tournamentData.players.forEach(player => {
+                content += `Certificate of Participation\n`;
+                content += `Awarded to: ${player.name}\n`;
+                content += `For participating in ${tournamentData.name || 'Chess Tournament'}\n`;
+                content += `Final Score: ${player.score} points\n`;
+                content += `Date: ${tournamentData.date || 'Date'}\n`;
+                content += `Category: ${player.category}\n\n`;
+                content += '-'.repeat(40) + '\n\n';
+            });
+            
+            downloadFile(content, 'certificates.txt', 'text/plain');
+        }
+
+        function generateShareableLink() {
+            // Create a compressed version of tournament data for URL
+            const shareData = {
+                n: tournamentData.name,
+                d: tournamentData.date,
+                v: tournamentData.venue,
+                t: tournamentData.type,
+                r: tournamentData.rounds,
+                tc: tournamentData.timeControl,
+                p: tournamentData.players.map(p => ({
+                    n: p.name,
+                    a: p.age,
+                    r: p.rating,
+                    s: p.score
+                }))
+            };
+            
+            try {
+                const compressed = btoa(JSON.stringify(shareData));
+                const currentUrl = window.location.href.split('?')[0];
+                const shareUrl = `${currentUrl}?data=${compressed}`;
+                
+                document.getElementById('shareLinkInput').value = shareUrl;
+                document.getElementById('shareLink').style.display = 'block';
+            } catch (error) {
+                alert('Tournament data is too large to create a shareable link. Try exporting as JSON instead.');
+            }
+        }
+
+        function copyShareLink() {
+            const input = document.getElementById('shareLinkInput');
+            input.select();
+            document.execCommand('copy');
+            alert('Link copied to clipboard!');
+        }
+
+        function loadFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const data = urlParams.get('data');
+            
+            if (data) {
+                try {
+                    const decoded = JSON.parse(atob(data));
+                    
+                    // Convert back to full format
+                    tournamentData.name = decoded.n || '';
+                    tournamentData.date = decoded.d || '';
+                    tournamentData.venue = decoded.v || '';
+                    tournamentData.type = decoded.t || 'swiss';
+                    tournamentData.rounds = decoded.r || 5;
+                    tournamentData.timeControl = decoded.tc || '90+30';
+                    
+                    if (decoded.p) {
+                        tournamentData.players = decoded.p.map((p, index) => ({
+                            id: Date.now() + index,
+                            name: p.n,
+                            age: p.a,
+                            rating: p.r || 0,
+                            email: '',
+                            phone: '',
+                            category: p.a < 18 ? 'youth' : 'adult',
+                            score: p.s || 0,
+                            matches: []
+                        }));
+                    }
+                    
+                    // Show read-only banner
+                    const banner = document.createElement('div');
+                    banner.innerHTML = `
+                        <div style="background: #ffc107; padding: 10px; text-align: center; font-weight: bold;">
+                            📖 Viewing shared tournament (Read-only mode)
+                        </div>
+                    `;
+                    document.body.insertBefore(banner, document.body.firstChild);
+                    
+                    // Restore display
+                    restoreFormValues();
+                    updatePlayerList();
+                    updatePlayerStats();
+                    updateLeaderboard();
+                    
+                    return true;
+                } catch (error) {
+                    console.error('Error loading shared tournament:', error);
+                }
+            }
+            return false;
+        }
+
+        function downloadFile(content, filename, mimeType) {
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Event listeners
+        document.getElementById('resultRound').addEventListener('change', updateMatchOptions);
+
+        // Initialize on page load
+        window.addEventListener('load', function() {
+            // Try to load from URL first (shared tournament)
+            if (!loadFromUrl()) {
+                // If no URL data, load from localStorage
+                loadTournamentData();
+            }
+            
+            updateRoundOptions();
+            updatePlayerStats();
+            
+            // Auto-save on form changes
+            document.getElementById('tournamentName').addEventListener('input', autoSave);
+            document.getElementById('tournamentDate').addEventListener('input', autoSave);
+            document.getElementById('tournamentVenue').addEventListener('input', autoSave);
+        });
+    </script>
+</body>
+</html>
