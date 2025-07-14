@@ -557,7 +557,7 @@
 
         function loadTournamentData() {
             try {
-                const saved = localStorage.getItem('chessTimeout');
+                const saved = localStorage.getItem('chessTournament');
                 if (saved) {
                     const parsed = JSON.parse(saved);
                     tournamentData = { ...tournamentData, ...parsed };
@@ -634,7 +634,7 @@
 
         function clearAllData() {
             if (confirm('Are you sure you want to clear all tournament data? This cannot be undone.')) {
-                localStorage.removeItem('chessTimeout');
+                localStorage.removeItem('chessTournament');
                 location.reload();
             }
         }
@@ -643,6 +643,7 @@
             saveTournamentData();
         }
 
+        // Tab management
         function showTab(tabName) {
             // Hide all tab contents
             document.querySelectorAll('.tab-content').forEach(tab => {
@@ -661,6 +662,7 @@
             event.target.classList.add('active');
         }
 
+        // Tournament settings functions
         function saveTournamentSettings() {
             tournamentData.name = document.getElementById('tournamentName').value;
             tournamentData.date = document.getElementById('tournamentDate').value;
