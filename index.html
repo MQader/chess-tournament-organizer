@@ -532,6 +532,7 @@
     </div>
 
     <script>
+        // Global tournament data
         let tournamentData = {
             name: '',
             date: '',
@@ -562,7 +563,6 @@
                     const parsed = JSON.parse(saved);
                     tournamentData = { ...tournamentData, ...parsed };
                     
-                    // Restore form values
                     restoreFormValues();
                     updatePlayerList();
                     updatePlayerStats();
@@ -590,79 +590,25 @@
             if (tournamentData.entryFee) document.getElementById('entryFee').value = tournamentData.entryFee;
         }
 
-        function exportTournamentData() {
-            const dataStr = JSON.stringify(tournamentData, null, 2);
-            const timestamp = new Date().toISOString().slice(0, 19).replace(/[:-]/g, '');
-            const filename = `tournament_${tournamentData.name ? tournamentData.name.replace(/[^a-zA-Z0-9]/g, '_') : 'data'}_${timestamp}.json`;
-            downloadFile(dataStr, filename, 'application/json');
-        }
-
-        function importTournamentData(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const imported = JSON.parse(e.target.result);
-                    
-                    // Validate imported data structure
-                    if (imported && typeof imported === 'object') {
-                        tournamentData = { ...tournamentData, ...imported };
-                        saveTournamentData();
-                        
-                        // Refresh all displays
-                        restoreFormValues();
-                        updatePlayerList();
-                        updatePlayerStats();
-                        updateBracketDisplay();
-                        updateLeaderboard();
-                        updateRoundOptions();
-                        updateMatchOptions();
-                        
-                        alert('Tournament data imported successfully!');
-                    } else {
-                        alert('Invalid file format. Please select a valid tournament JSON file.');
-                    }
-                } catch (error) {
-                    alert('Error reading file. Please check the file format.');
-                    console.error('Import error:', error);
-                }
-            };
-            reader.readAsText(file);
-        }
-
-        function clearAllData() {
-            if (confirm('Are you sure you want to clear all tournament data? This cannot be undone.')) {
-                localStorage.removeItem('chessTournament');
-                location.reload();
-            }
-        }
-
         function autoSave() {
             saveTournamentData();
         }
 
         // Tab management
         function showTab(tabName) {
-            // Hide all tab contents
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
             });
             
-            // Remove active class from all tabs
             document.querySelectorAll('.tab').forEach(tab => {
                 tab.classList.remove('active');
             });
             
-            // Show selected tab content
             document.getElementById(tabName).classList.add('active');
-            
-            // Add active class to clicked tab
             event.target.classList.add('active');
         }
 
-        // Tournament settings functions
+        // Tournament settings
         function saveTournamentSettings() {
             tournamentData.name = document.getElementById('tournamentName').value;
             tournamentData.date = document.getElementById('tournamentDate').value;
@@ -677,6 +623,7 @@
             updateRoundOptions();
         }
 
+        // Player management
         function addPlayer() {
             const name = document.getElementById('playerName').value;
             const age = parseInt(document.getElementById('playerAge').value);
@@ -716,6 +663,13 @@
             document.getElementById('playerPhone').value = '';
         }
 
+        function removePlayer(playerId) {
+            tournamentData.players = tournamentData.players.filter(p => p.id !== playerId);
+            updatePlayerList();
+            updatePlayerStats();
+            autoSave();
+        }
+
         function updatePlayerList() {
             const playerList = document.getElementById('playerList');
             
@@ -744,13 +698,6 @@
             `).join('');
         }
 
-        function removePlayer(playerId) {
-            tournamentData.players = tournamentData.players.filter(p => p.id !== playerId);
-            updatePlayerList();
-            updatePlayerStats();
-            autoSave();
-        }
-
         function updatePlayerStats() {
             const total = tournamentData.players.length;
             const youth = tournamentData.players.filter(p => p.category === 'youth').length;
@@ -764,6 +711,7 @@
             document.getElementById('avgRating').textContent = avgRating;
         }
 
+        // Bracket management
         function generateBrackets() {
             if (tournamentData.players.length < 2) {
                 alert('Need at least 2 players to generate brackets');
@@ -773,7 +721,6 @@
             const players = [...tournamentData.players].sort((a, b) => (b.rating || 0) - (a.rating || 0));
             tournamentData.brackets = [];
             
-            // Generate first round pairings
             const matches = [];
             for (let i = 0; i < players.length; i += 2) {
                 if (i + 1 < players.length) {
@@ -804,7 +751,6 @@
             }
             
             const players = [...tournamentData.players];
-            // Shuffle array
             for (let i = players.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [players[i], players[j]] = [players[j], players[i]];
@@ -875,6 +821,7 @@
             `).join('');
         }
 
+        // Results management
         function updateRoundOptions() {
             const roundSelect = document.getElementById('resultRound');
             roundSelect.innerHTML = '';
@@ -934,7 +881,6 @@
                     updateLeaderboard();
                     autoSave();
                     
-                    // Clear form
                     document.getElementById('resultMatch').value = '';
                     document.getElementById('matchResult').value = '';
                     
@@ -983,6 +929,54 @@
                     </tbody>
                 </table>
             `;
+        }
+
+        // Export functions
+        function exportTournamentData() {
+            const dataStr = JSON.stringify(tournamentData, null, 2);
+            const timestamp = new Date().toISOString().slice(0, 19).replace(/[:-]/g, '');
+            const filename = `tournament_${tournamentData.name ? tournamentData.name.replace(/[^a-zA-Z0-9]/g, '_') : 'data'}_${timestamp}.json`;
+            downloadFile(dataStr, filename, 'application/json');
+        }
+
+        function importTournamentData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    
+                    if (imported && typeof imported === 'object') {
+                        tournamentData = { ...tournamentData, ...imported };
+                        saveTournamentData();
+                        
+                        restoreFormValues();
+                        updatePlayerList();
+                        updatePlayerStats();
+                        updateBracketDisplay();
+                        updateLeaderboard();
+                        updateRoundOptions();
+                        updateMatchOptions();
+                        
+                        alert('Tournament data imported successfully!');
+                    } else {
+                        alert('Invalid file format. Please select a valid tournament JSON file.');
+                    }
+                } catch (error) {
+                    alert('Error reading file. Please check the file format.');
+                    console.error('Import error:', error);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear all tournament data? This cannot be undone.')) {
+                localStorage.removeItem('chessTournament');
+                location.reload();
+            }
         }
 
         function exportPlayerList() {
@@ -1128,16 +1122,14 @@
             let content = `CERTIFICATES\n`;
             content += '='.repeat(60) + '\n\n';
             
-            // Winner certificates
             if (sortedPlayers.length > 0) {
                 content += `OVERALL WINNER\n`;
-                content += '-'.repeat(30) + '\n`;
+                content += '-'.repeat(30) + '\n';
                 content += `This certifies that ${sortedPlayers[0].name} has won\n`;
                 content += `${tournamentData.name || 'Chess Tournament'}\n`;
                 content += `with a score of ${sortedPlayers[0].score} points\n`;
                 content += `on ${tournamentData.date || 'Date'}\n\n`;
                 
-                // Category winners
                 const youthWinner = sortedPlayers.find(p => p.category === 'youth');
                 const adultWinner = sortedPlayers.find(p => p.category === 'adult');
                 
@@ -1160,7 +1152,6 @@
                 }
             }
             
-            // Participation certificates
             content += `PARTICIPATION CERTIFICATES\n`;
             content += '-'.repeat(30) + '\n';
             tournamentData.players.forEach(player => {
@@ -1177,7 +1168,6 @@
         }
 
         function generateShareableLink() {
-            // Create a compressed version of tournament data for URL
             const shareData = {
                 n: tournamentData.name,
                 d: tournamentData.date,
@@ -1220,7 +1210,6 @@
                 try {
                     const decoded = JSON.parse(atob(data));
                     
-                    // Convert back to full format
                     tournamentData.name = decoded.n || '';
                     tournamentData.date = decoded.d || '';
                     tournamentData.venue = decoded.v || '';
@@ -1242,7 +1231,6 @@
                         }));
                     }
                     
-                    // Show read-only banner
                     const banner = document.createElement('div');
                     banner.innerHTML = `
                         <div style="background: #ffc107; padding: 10px; text-align: center; font-weight: bold;">
@@ -1251,7 +1239,6 @@
                     `;
                     document.body.insertBefore(banner, document.body.firstChild);
                     
-                    // Restore display
                     restoreFormValues();
                     updatePlayerList();
                     updatePlayerStats();
@@ -1277,11 +1264,8 @@
             URL.revokeObjectURL(url);
         }
 
-        // Event listeners
-        document.getElementById('resultRound').addEventListener('change', updateMatchOptions);
-
-        // Initialize on page load
-        window.addEventListener('load', function() {
+        // Event listeners and initialization
+        document.addEventListener('DOMContentLoaded', function() {
             // Try to load from URL first (shared tournament)
             if (!loadFromUrl()) {
                 // If no URL data, load from localStorage
@@ -1290,6 +1274,9 @@
             
             updateRoundOptions();
             updatePlayerStats();
+            
+            // Add event listeners
+            document.getElementById('resultRound').addEventListener('change', updateMatchOptions);
             
             // Auto-save on form changes
             document.getElementById('tournamentName').addEventListener('input', autoSave);
